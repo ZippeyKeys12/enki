@@ -1,0 +1,25 @@
+class Ek_Lobe play abstract{
+    virtual
+    void Think(){}
+
+    virtual
+    void Tick(){}
+}
+
+class Ek_SensorLobe:Ek_Lobe abstract{
+    virtual
+    ZStimulus Sense(Ek_Actor This, ZStimulus Stim=null)
+    {return null;}
+}
+
+class Ek_PlannerLobe:Ek_Lobe abstract{
+    virtual
+    Name Plan(ZStimulus Stim)
+    {return '';}
+}
+
+class Ek_ActuatorLobe:Ek_Lobe abstract{
+    virtual
+    bool Act(Ek_Actor This, Name PlanOAction)
+    {return false;}
+}

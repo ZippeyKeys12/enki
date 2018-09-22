@@ -1,0 +1,58 @@
+class Ek_Brain:Ek_Reactor abstract{
+    Ek_Actor Owner;
+
+    Ek_Stack Stack;
+
+    Array<Ek_SensorLobe> __Sense__;
+    Array<Ek_PlannerLobe> __Plan__;
+    Array<Ek_ActuatorLobe> __Act__;
+
+    static
+    Ek_Brain Create(Class<Ek_Brain> Type, Ek_Actor Owner){
+        Ek_Brain Result=Ek_Brain(new(Type));
+        Result.Owner=Owner;
+        Result.Stack=new('Ek_Stack');
+        return Result;
+    }
+
+    // TODO: Solidify architecture of lobe interaction
+    override
+    bool React(ZStimulus Stim)
+    {return Think(Stim);}
+
+    virtual
+    bool Think(ZStimulus Stim=null)
+    {return Act(Plan(Sense(Stim)));}
+
+    virtual
+    ZStimulus Sense(ZStimulus Stim=null){
+        ZStimulus Result;
+        for(int i=0; i<__Sense__.Size(); i++){
+            Result=__Sense__[i].Sense(Owner, Stim);
+            if(Result)
+                return Result;
+        }
+        return null;
+    }
+
+    virtual
+    Name Plan(ZStimulus Stim){
+        Name PlanOAction='';
+        for(int i=0; i<__Plan__.Size(); i++){
+            PlanOAction=__Plan__[i].Plan(Stim);
+            if(PlanOAction)
+                return PlanOAction;
+        }
+        return '';
+    }
+
+    virtual
+    bool Act(Name PlanOAction){
+        bool Acted;
+        for(int i=0; i<__Act__.Size(); i++){
+            if(__Act__[i].Act(Owner, PlanOAction))
+                Acted=true;
+        }
+        return Acted;
+    }
+}

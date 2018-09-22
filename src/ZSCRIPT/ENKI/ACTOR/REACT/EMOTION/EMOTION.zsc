@@ -1,0 +1,34 @@
+class Ek_Emotion:Ek_FSM{
+    const DIMENSIONCOUNT_EKMAN=5;
+    const DIMENSIONCOUNT_OCC=22;
+
+    uint Strength,
+         Decay;
+
+    static
+    Ek_Emotion Create(Name DefaultState='Neutral')
+    {return Ek_Emotion(Ek_FSM.Create('Ek_Emotion', DefaultState));}
+
+    bool Set(Name NewState, uint Decay, uint Strength=STR_MIN){
+        if(!IsValid(NewState))
+            return false;
+        if(NewState==__State__){
+            self.Strength+=Strength;
+            self.Decay+=Decay;
+        }else{
+            self.Strength=Strength;
+            self.Decay=Decay;
+        }
+        return super.Set(NewState);
+    }
+
+    override
+    void Tick(){
+        if(Decay)
+            Decay--;
+        else{
+            __State__='';
+            Strength=0;
+        }
+    }
+}

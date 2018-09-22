@@ -1,0 +1,32 @@
+class Ek_Pathos:Ek_Lobe{
+    Ek_Personality Personality;
+
+    Ek_Mood Mood;
+
+    Ek_Emotion Emotion;
+
+    static
+    Ek_Pathos Create(Class<Ek_Emotion> EmotionName='Ek_Emotion', Ek_Personality BasePersonality=null){
+        Ek_Pathos Result=new('Ek_Pathos');
+        if(BasePersonality)
+            Result.Personality=Ek_Personality.Create(BasePersonality.Facets);
+        else Result.Personality=Ek_Personality.Randomized();
+        Result.Mood=Ek_Mood.Create(Result.Personality);
+        Result.Emotion=Ek_Emotion(Ek_FSM.Create(EmotionName, 'Neutral'));
+        return Result;
+    }
+
+    // override
+    // void Think(){
+    //     super.Tick();
+    //     //Mood.Tick();
+    //     Emotion.Tick();
+    // }
+
+    Ek_Pathos Clone(){
+        Ek_Pathos Result=new('Ek_Pathos');
+        Result.Personality=Personality.Clone();
+        Result.Emotion=Ek_Emotion(Ek_FSM.Create(Emotion.GetClassName(), 'Neutral'));
+        return Result;
+    }
+}

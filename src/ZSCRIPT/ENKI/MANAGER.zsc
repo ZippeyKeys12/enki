@@ -1,0 +1,27 @@
+class Ek_Manager:Thinker{
+    Av_Vector P2E;
+
+    Av_Matrix2 P2M,
+             M2E_OCC,
+             M2E_Ekman;
+
+    static
+    Ek_Manager Instance(){
+        Ek_Manager p=DataInstance();
+        if(!p)p=new('Ek_Manager').Init();
+        return p;
+    }
+
+    static
+    clearscope
+    Ek_Manager DataInstance(){
+        ThinkerIterator it=ThinkerIterator.Create('Ek_Manager', STAT_STATIC);
+        return Ek_Manager(it.Next());
+    }
+
+    private
+    Ek_Manager Init(){
+        ChangeStatNum(STAT_STATIC);
+        return self;
+    }
+}
