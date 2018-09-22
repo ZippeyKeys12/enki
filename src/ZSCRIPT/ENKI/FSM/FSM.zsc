@@ -1,0 +1,32 @@
+class Ek_FSM abstract{    
+    private
+    Name DefaultState;
+
+    protected
+    Name __State__;
+
+    static
+    Ek_FSM Create(Class<Ek_FSM> Type, Name DefaultState='Idle')
+    {return Ek_FSM(new(Type)).Init(DefaultState);}
+
+    virtual
+    protected
+    Ek_FSM Init(Name DefaultState='Idle'){
+        self.DefaultState=DefaultState;
+        return self;
+    }
+
+    virtual
+    bool Set(Name NewState)
+    {return (IsValid(NewState))?bool(__State__=NewState):false;}
+
+    virtual
+    void Tick(){}
+
+    virtual
+    bool IsValid(Name State)
+    {return true;}
+
+    Name State()
+    {return (__State__=='')?DefaultState:__State__;}
+}
