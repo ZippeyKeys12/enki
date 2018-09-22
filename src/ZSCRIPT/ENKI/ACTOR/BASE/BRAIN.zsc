@@ -17,16 +17,16 @@ class Ek_Brain:Ek_Reactor abstract{
 
     // TODO: Solidify architecture of lobe interaction
     override
-    bool React(ZStimulus Stim)
+    bool React(Ek_Stimulus Stim)
     {return Think(Stim);}
 
     virtual
-    bool Think(ZStimulus Stim=null)
+    bool Think(Ek_Stimulus Stim=null)
     {return Act(Plan(Sense(Stim)));}
 
     virtual
-    ZStimulus Sense(ZStimulus Stim=null){
-        ZStimulus Result;
+    Ek_Stimulus Sense(Ek_Stimulus Stim=null){
+        Ek_Stimulus Result;
         for(int i=0; i<__Sense__.Size(); i++){
             Result=__Sense__[i].Sense(Owner, Stim);
             if(Result)
@@ -36,7 +36,7 @@ class Ek_Brain:Ek_Reactor abstract{
     }
 
     virtual
-    Name Plan(ZStimulus Stim){
+    Name Plan(Ek_Stimulus Stim){
         Name PlanOAction='';
         for(int i=0; i<__Plan__.Size(); i++){
             PlanOAction=__Plan__[i].Plan(Stim);

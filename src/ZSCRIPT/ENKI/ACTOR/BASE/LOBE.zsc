@@ -8,13 +8,13 @@ class Ek_Lobe play abstract{
 
 class Ek_SensorLobe:Ek_Lobe abstract{
     virtual
-    ZStimulus Sense(Ek_Actor This, ZStimulus Stim=null)
+    Ek_Stimulus Sense(Ek_Actor This, Ek_Stimulus Stim=null)
     {return null;}
 }
 
 class Ek_PlannerLobe:Ek_Lobe abstract{
     virtual
-    Name Plan(ZStimulus Stim)
+    Name Plan(Ek_Stimulus Stim)
     {return '';}
 }
 

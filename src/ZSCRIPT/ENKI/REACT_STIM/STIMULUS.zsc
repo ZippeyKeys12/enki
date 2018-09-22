@@ -1,4 +1,4 @@
-enum ZE_StimStrength{
+enum Ek_EStimStrength{
     STR_MIN         =   1,
     STR_WEAK        =   50,
     STR_MODERATE    =   5*STR_WEAK,
@@ -7,7 +7,7 @@ enum ZE_StimStrength{
     STR_MAX         =   1500,
 }
 
-class ZStimulus{
+class Ek_Stimulus{
     uint Persistence;
 
     int Decay;
@@ -20,7 +20,7 @@ class ZStimulus{
           Emitter;
 
     virtual
-    ZStimulus Init(Actor Emitter, Name ID, double Strength, int Time, uint Cooldown, Actor Target=null){
+    Ek_Stimulus Init(Actor Emitter, Name ID, double Strength, int Time, uint Cooldown, Actor Target=null){
         self.Strength=Strength;
         Persistence=Cooldown;
         self.Emitter=Emitter;
@@ -36,7 +36,7 @@ class ZStimulus{
             Decay=Max(Decay-1, 0);
     }
 
-    bool SimilarTo(ZStimulus Other){
+    bool SimilarTo(Ek_Stimulus Other){
         return ID==Other.ID && Target==Other.Target && Emitter==Other.Emitter;
     }
 }

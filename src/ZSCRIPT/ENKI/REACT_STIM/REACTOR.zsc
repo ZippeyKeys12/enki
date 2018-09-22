@@ -8,10 +8,10 @@ class Ek_Reactor play abstract{
 
     Name ID;
 
-    ZStimulus CurrStim;
+    Ek_Stimulus CurrStim;
 
     virtual
-    bool React(ZStimulus Stim){
+    bool React(Ek_Stimulus Stim){
         if(!IsValid(Stim))
             return false;
         if(CurrStim && CurrStim!=Stim && CurrStim.SimilarTo(Stim))
@@ -38,7 +38,7 @@ class Ek_Reactor play abstract{
     }
 
     virtual
-    bool IsValid(ZStimulus Stim)
+    bool IsValid(Ek_Stimulus Stim)
     {return true;}
 
     virtual
