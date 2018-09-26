@@ -13,27 +13,8 @@ class Ek_Actor{
         FlightSpeed=0;
     }
 
-    void A_MoveTo(Actor Target=null){
-        double MaxForce=5.5;
-        Vector3 Steer=(0, 0, 0);
-        if(!Target){
-            if(self.Target)
-                Target=self.Target;
-            else return;
-        }
-        Steer+=.5*Seek(Target, true);
-        Steer+=CollisionAvoidance(Target);
-        if(Steer.Z>FlightSpeed)
-            Steer.Z=FlightSpeed;
-        if(Steer.Length()>MaxForce)
-            Steer=MaxForce*Steer.Unit();
-        Vel+=Steer/Mass*12.5;
-        if(Vel.Length()>WalkSpeed)
-            Vel=WalkSpeed*Vel.Unit();
-    }
-
-    Vector3 Seek(Actor Target, bool Arrive=false, bool Predict=false){
-        Vector3 DesVel=Vec3To(Target)+Predict*Target.Vel;
+    Vector3 Seek(Vector3 Target, bool Arrive=false){
+        Vector3 DesVel=level.Vec3Diff(Pos, Target);
         double Distance=DesVel.Length();
         DesVel*=WalkSpeed;
         if(Arrive){
@@ -45,36 +26,76 @@ class Ek_Actor{
         return DesVel-Vel;
     }
 
-    Vector3 Pursue(Actor Target, bool Arrive=false)
-    {return Seek(Target, Arrive, true);}
+    Vector3 Flee(Vector3 Target)
+    {return -Seek(Target);}
 
-    Vector3 Flee(Actor Target, bool Arrive=false, bool Predict=false)
-    {return -Seek(Target, Arrive, Predict);}
+    Vector3 Pursue(Vector3 Target, Vector3 Vel, bool Arrive=false)
+    {return Seek(Target+Vel, Arrive);}
 
-    Vector3 Evade(Actor Target, bool Arrive=false)
-    {return Flee(Target, Arrive, true);}
+    Vector3 Evade(Vector3 Target, Vector3 Vel, bool Arrive=false)
+    {return Flee(Target+Vel, Arrive);}
 
-    Vector3 CollisionAvoidance(Actor Target){
-        double MaxRadius=Radius*sqrt(2);
-        Vector2 Additive=AngleToVector(Angle, MaxRadius)+Vel.XY,
-                LeftVector=AngleToVector(Angle+90, MaxRadius),
-                RightVector=AngleToVector(Angle-90, MaxRadius);
-        FCheckPosition LeftD, RightD;
-        bool Left=CheckMove(Pos.XY+LeftVector, 0, LeftD),
-             Right=CheckMove(Pos.XY+RightVector, 0, RightD);
-        Vector3 Change=(0, 0, 0);
-        FLineTraceData Data;
-        bool Hit=false;
-        for(int i=0; i<360; i+=90){
-            Hit=Hit || LineTrace(Angle+i, Additive.Length(), 0, OffsetZ: MaxStepHeight, OffsetSide: MaxRadius, Data)
-                    || LineTrace(Angle+i, Additive.Length(), 0, OffsetZ: MaxStepHeight, OffsetSide: -MaxRadius, Data)
-                    || LineTrace(Angle+i, Additive.Length(), 0, OffsetZ: MaxStepHeight, Data: Data);
+    Vector3 Align(double radius, class<Actor> type='Actor'){
+        let it=BlockThingsIterator.Create(self, radius);
+        uint neighborCount=0;
+        Vector3 desVel=(0, 0, 0);
+        while(it.Next()){
+            if(self!=it.thing && it.thing is type){
+                desVel+=it.thing.vel;
+                neighborCount++;
+            }
         }
-        if(Hit){
-            Actor HitActor;
-            if((HitActor=Data.HitActor) && HitActor!=Target)
-                Change+=300*(Pos+Additive-HitActor.Pos).Unit();
-        }
-        return Change;
+        if(neighborCount==0)
+            return desVel;
+        return desVel/neighborCount;
     }
+
+    Vector3 Cohere(double radius, class<Actor> type='Actor'){
+        let it=BlockThingsIterator.Create(self, radius);
+        uint neighborCount=0;
+        Vector3 desVel=(0, 0, 0);
+        while(it.Next()){
+            if(self!=it.thing && it.thing is type){
+                desVel+=it.thing.pos;
+                neighborCount++;
+            }
+        }
+        return desVel/neighborCount-pos;
+    }
+
+    Vector3 Separate(double radius, class<Actor> type='Actor'){
+        let it=BlockThingsIterator.Create(self, radius);
+        Vector3 desVel=(0, 0, 0);
+        while(it.Next()){
+            if(self!=it.thing && it.thing is type){
+                desVel+=level.Vec3Diff(it.thing.pos, pos);
+                neighborCount++;
+            }
+        }
+        return -desVel/neighborCount;
+    }
+
+    // Vector3 CollisionAvoidance(Actor Target){
+    //     double MaxRadius=Radius*sqrt(2);
+    //     Vector2 Additive=AngleToVector(Angle, MaxRadius)+Vel.XY,
+    //             LeftVector=AngleToVector(Angle+90, MaxRadius),
+    //             RightVector=AngleToVector(Angle-90, MaxRadius);
+    //     FCheckPosition LeftD, RightD;
+    //     bool Left=CheckMove(Pos.XY+LeftVector, 0, LeftD),
+    //          Right=CheckMove(Pos.XY+RightVector, 0, RightD);
+    //     Vector3 Change=(0, 0, 0);
+    //     FLineTraceData Data;
+    //     bool Hit=false;
+    //     for(int i=0; i<360; i+=90){
+    //         Hit=Hit || LineTrace(Angle+i, Additive.Length(), 0, OffsetZ: MaxStepHeight, OffsetSide: MaxRadius, Data)
+    //                 || LineTrace(Angle+i, Additive.Length(), 0, OffsetZ: MaxStepHeight, OffsetSide: -MaxRadius, Data)
+    //                 || LineTrace(Angle+i, Additive.Length(), 0, OffsetZ: MaxStepHeight, Data: Data);
+    //     }
+    //     if(Hit){
+    //         Actor HitActor;
+    //         if((HitActor=Data.HitActor) && HitActor!=Target)
+    //             Change+=300*(Pos+Additive-HitActor.Pos).Unit();
+    //     }
+    //     return Change;
+    // }
 }
