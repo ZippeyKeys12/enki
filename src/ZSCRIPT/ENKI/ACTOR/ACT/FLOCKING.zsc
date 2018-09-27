@@ -13,6 +13,8 @@ class Ek_Actor{
         }
         if(neighborCount==0)
             return desVel;
+        if(!CanFly)
+            desVel=(desVel.x, desVel.y, 0);
         return (desVel/neighborCount).Unit()*MaxSpeed;
     }
 
@@ -29,6 +31,8 @@ class Ek_Actor{
         }
         if(neighborCount==0)
             return desVel;
+        if(!CanFly)
+            desVel=(desVel.x, desVel.y, 0);
         return Seek(desVel/neighborCount);
     }
 
@@ -45,6 +49,8 @@ class Ek_Actor{
         }
         if(neighborCount==0)
             return desVel;
+        if(!CanFly)
+            desVel=(desVel.x, desVel.y, 0);
         return (desVel/neighborCount).Unit()*MaxSpeed;
     }
 }
