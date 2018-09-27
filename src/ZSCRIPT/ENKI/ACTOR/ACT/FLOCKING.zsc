@@ -1,0 +1,50 @@
+extend
+class Ek_Actor{
+    Vector3 Separate(double radius, class<Actor> type='Actor'){
+        let it=BlockThingsIterator.Create(self, radius);
+        Vector3 desVel=(0, 0, 0);
+        while(it.Next()){
+            Actor other=it.thing;
+            if(self!=other && other is type){
+                Vector3 diff=level.Vec3Diff(pos, other.pos);
+                desVel+=diff.Unit()/diff.Length();
+                neighborCount++;
+            }
+        }
+        if(neighborCount==0)
+            return desVel;
+        return (desVel/neighborCount).Unit()*MaxSpeed;
+    }
+
+    Vector3 Cohere(double radius, class<Actor> type='Actor'){
+        let it=BlockThingsIterator.Create(self, radius);
+        uint neighborCount=0;
+        Vector3 desVel=(0, 0, 0);
+        while(it.Next()){
+            Actor other=it.thing;
+            if(self!=other && other is type){
+                desVel+=other.pos;
+                neighborCount++;
+            }
+        }
+        if(neighborCount==0)
+            return desVel;
+        return Seek(desVel/neighborCount);
+    }
+
+    Vector3 Align(double radius, class<Actor> type='Actor'){
+        let it=BlockThingsIterator.Create(self, radius);
+        uint neighborCount=0;
+        Vector3 desVel=(0, 0, 0);
+        while(it.Next()){
+            Actor other=it.thing;
+            if(self!=other && other is type){
+                desVel+=other.vel;
+                neighborCount++;
+            }
+        }
+        if(neighborCount==0)
+            return desVel;
+        return (desVel/neighborCount).Unit()*MaxSpeed;
+    }
+}

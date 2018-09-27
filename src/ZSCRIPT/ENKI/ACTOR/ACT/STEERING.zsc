@@ -1,101 +1,42 @@
 extend
 class Ek_Actor{
-    meta
-    double WalkSpeed,
-           FlightSpeed;
+    bool CanFly;
 
-    Property WalkSpeed: WalkSpeed;
-    Property FlightSpeed: FlightSpeed;
+    double MaxSpeed;
+
+    Property CanFly: CanFly;
+    Property MaxSpeed: MaxSpeed;
 
     [Property]{
         [Ek_Actor]
-        WalkSpeed=50;
-        FlightSpeed=0;
+        CanFly=true;
+        MaxSpeed=50;
     }
 
-    Vector3 Seek(Vector3 Target, bool Arrive=false){
-        Vector3 DesVel=level.Vec3Diff(Pos, Target);
-        double Distance=DesVel.Length();
-        DesVel*=WalkSpeed;
-        if(Arrive){
-            if(Distance<Target.Radius)
-                return -Vel;
-            else if(Distance<Target.Radius*2)
-                DesVel/=Target.Radius;
-        }else DesVel/=Distance;
-        return DesVel-Vel;
+    Vector3 Steer(Vector3 ideal)
+    {return ideal-Vel;}
+
+    Vector3 Seek(Vector3 target){
+        Vector3 vec=level.Vec3Diff(target, Pos);
+        if(!CanFly)
+            vec=(vec.x, vec.y, 0);
+        return vec.Unit()*MaxSpeed;
     }
 
-    Vector3 Flee(Vector3 Target)
-    {return -Seek(Target);}
-
-    Vector3 Pursue(Vector3 Target, Vector3 Vel, bool Arrive=false)
-    {return Seek(Target+Vel, Arrive);}
-
-    Vector3 Evade(Vector3 Target, Vector3 Vel, bool Arrive=false)
-    {return Flee(Target+Vel, Arrive);}
-
-    Vector3 Align(double radius, class<Actor> type='Actor'){
-        let it=BlockThingsIterator.Create(self, radius);
-        uint neighborCount=0;
-        Vector3 desVel=(0, 0, 0);
-        while(it.Next()){
-            if(self!=it.thing && it.thing is type){
-                desVel+=it.thing.vel;
-                neighborCount++;
-            }
-        }
-        if(neighborCount==0)
-            return desVel;
-        return desVel/neighborCount;
+    Vector3 Arrive(Vector3 target, double stoppingRadius){
+        Vector3 vec=level.Vec3Diff(target, Pos);
+        if(!CanFly)
+            vec=(vec.x, vec.y, 0);
+        double dist=vec.Length();
+        vec=Min(maxspeed*(dist/stoppingRadius), maxspeed)/dist*vec;
     }
 
-    Vector3 Cohere(double radius, class<Actor> type='Actor'){
-        let it=BlockThingsIterator.Create(self, radius);
-        uint neighborCount=0;
-        Vector3 desVel=(0, 0, 0);
-        while(it.Next()){
-            if(self!=it.thing && it.thing is type){
-                desVel+=it.thing.pos;
-                neighborCount++;
-            }
-        }
-        return desVel/neighborCount-pos;
-    }
+    Vector3 Pursue(Vector3 target, Vector3 vel)
+    {return Seek(target+vel);}
 
-    Vector3 Separate(double radius, class<Actor> type='Actor'){
-        let it=BlockThingsIterator.Create(self, radius);
-        Vector3 desVel=(0, 0, 0);
-        while(it.Next()){
-            if(self!=it.thing && it.thing is type){
-                desVel+=level.Vec3Diff(it.thing.pos, pos);
-                neighborCount++;
-            }
-        }
-        return -desVel/neighborCount;
-    }
+    Vector3 Flee(Vector3 target)
+    {return -Seek(target);}
 
-    // Vector3 CollisionAvoidance(Actor Target){
-    //     double MaxRadius=Radius*sqrt(2);
-    //     Vector2 Additive=AngleToVector(Angle, MaxRadius)+Vel.XY,
-    //             LeftVector=AngleToVector(Angle+90, MaxRadius),
-    //             RightVector=AngleToVector(Angle-90, MaxRadius);
-    //     FCheckPosition LeftD, RightD;
-    //     bool Left=CheckMove(Pos.XY+LeftVector, 0, LeftD),
-    //          Right=CheckMove(Pos.XY+RightVector, 0, RightD);
-    //     Vector3 Change=(0, 0, 0);
-    //     FLineTraceData Data;
-    //     bool Hit=false;
-    //     for(int i=0; i<360; i+=90){
-    //         Hit=Hit || LineTrace(Angle+i, Additive.Length(), 0, OffsetZ: MaxStepHeight, OffsetSide: MaxRadius, Data)
-    //                 || LineTrace(Angle+i, Additive.Length(), 0, OffsetZ: MaxStepHeight, OffsetSide: -MaxRadius, Data)
-    //                 || LineTrace(Angle+i, Additive.Length(), 0, OffsetZ: MaxStepHeight, Data: Data);
-    //     }
-    //     if(Hit){
-    //         Actor HitActor;
-    //         if((HitActor=Data.HitActor) && HitActor!=Target)
-    //             Change+=300*(Pos+Additive-HitActor.Pos).Unit();
-    //     }
-    //     return Change;
-    // }
+    Vector3 Evade(Vector3 Target, Vector3 vel)
+    {return Flee(Target+vel);}
 }
