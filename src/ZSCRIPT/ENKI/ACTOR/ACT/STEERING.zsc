@@ -28,7 +28,7 @@ class Ek_Actor{
         if(!CanFly)
             vec=(vec.x, vec.y, 0);
         double dist=vec.Length();
-        vec=Min(maxspeed*(dist/stoppingRadius), maxspeed)/dist*vec;
+        return Min(maxspeed*(dist/stoppingRadius), maxspeed)/dist*vec;
     }
 
     Vector3 Pursue(Vector3 target, Vector3 vel)

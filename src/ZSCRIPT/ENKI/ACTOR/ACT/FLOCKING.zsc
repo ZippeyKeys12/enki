@@ -2,6 +2,7 @@ extend
 class Ek_Actor{
     Vector3 Separate(double radius, class<Actor> type='Actor'){
         let it=BlockThingsIterator.Create(self, radius);
+        uint neighborCount=0;
         Vector3 desVel=(0, 0, 0);
         while(it.Next()){
             Actor other=it.thing;
