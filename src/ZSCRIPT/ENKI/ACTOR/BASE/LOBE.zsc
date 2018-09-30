@@ -1,4 +1,13 @@
 class Ek_Lobe play abstract{
+    Ek_Actor Owner;
+
+    static
+    Ek_Lobe Create(class<Ek_Lobe> type, Ek_Actor owner){
+        let result=Ek_Lobe(new(type));
+        result.Owner=Owner;
+        return result;
+    }
+
     virtual
     void Think(){}
 
@@ -8,18 +17,24 @@ class Ek_Lobe play abstract{
 
 class Ek_SensorLobe:Ek_Lobe abstract{
     virtual
-    Ek_Stimulus Sense(Ek_Actor This, Ek_Stimulus Stim=null)
-    {return null;}
+    bool, Vector3, Ek_EInfluence Sense()
+    {return false, Owner.Pos, INF_None;}
+}
+
+class Ek_ReactorLobe:Ek_Lobe abstract{
+    virtual
+    bool React(Ek_Stimulus This)
+    {return false;}
 }
 
 class Ek_PlannerLobe:Ek_Lobe abstract{
     virtual
-    Name Plan(Ek_Stimulus Stim)
+    Name Plan()
     {return '';}
 }
 
 class Ek_ActuatorLobe:Ek_Lobe abstract{
     virtual
-    bool Act(Ek_Actor This, Name PlanOAction)
+    bool Act(Name PlanOAction)
     {return false;}
 }

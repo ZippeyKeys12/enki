@@ -1,9 +1,12 @@
-class Ek_Brain:Ek_Reactor abstract{
+class Ek_Brain play abstract{
     Ek_Actor Owner;
 
     Ek_Stack Stack;
 
+    Ek_SenseManager CurrKnowledge;
+
     Array<Ek_SensorLobe> __Sense__;
+    Array<Ek_ReactorLobe> __React__;
     Array<Ek_PlannerLobe> __Plan__;
     Array<Ek_ActuatorLobe> __Act__;
 
@@ -12,34 +15,45 @@ class Ek_Brain:Ek_Reactor abstract{
         Ek_Brain Result=Ek_Brain(new(Type));
         Result.Owner=Owner;
         Result.Stack=new('Ek_Stack');
+        Result.CurrKnowledge=Ek_SenseManager.Create();
         return Result;
     }
 
-    // TODO: Solidify architecture of lobe interaction
-    override
-    bool React(Ek_Stimulus Stim)
-    {return Think(Stim);}
-
     virtual
-    bool Think(Ek_Stimulus Stim=null)
-    {return Act(Plan(Sense(Stim)));}
-
-    virtual
-    Ek_Stimulus Sense(Ek_Stimulus Stim=null){
-        Ek_Stimulus Result;
-        for(int i=0; i<__Sense__.Size(); i++){
-            Result=__Sense__[i].Sense(Owner, Stim);
-            if(Result)
-                return Result;
-        }
-        return null;
+    void Think(){
+        Sense();
+        Act(Plan());
     }
 
     virtual
-    Name Plan(Ek_Stimulus Stim){
+    void Sense(){
+        CurrKnowledge.Age();
+        bool sensed;
+        Vector3 influence;
+        Ek_EInfluence type;
+        for(int i=0; i<__Sense__.Size(); i++){
+            [sensed, influence, type]=__Sense__[i].Sense();
+            if(sensed)
+                CurrKnowledge.AddInfluence(influence, type);
+        }
+    }
+
+    // TODO: Solidify architecture of reactor, planner and actuator lobes
+    virtual
+    bool React(Ek_Stimulus Stim){
+        bool reacted;
+        for(int i=0; i<__React__.Size(); i++){
+            if(__React__[i].React(Stim))
+                reacted=true;
+        }
+        return reacted;
+    }
+
+    virtual
+    Name Plan(){
         Name PlanOAction='';
         for(int i=0; i<__Plan__.Size(); i++){
-            PlanOAction=__Plan__[i].Plan(Stim);
+            PlanOAction=__Plan__[i].Plan();
             if(PlanOAction)
                 return PlanOAction;
         }
@@ -48,9 +62,11 @@ class Ek_Brain:Ek_Reactor abstract{
 
     virtual
     bool Act(Name PlanOAction){
+        if(PlanOAction=='')
+            return false;
         bool Acted;
         for(int i=0; i<__Act__.Size(); i++){
-            if(__Act__[i].Act(Owner, PlanOAction))
+            if(__Act__[i].Act(PlanOAction))
                 Acted=true;
         }
         return Acted;

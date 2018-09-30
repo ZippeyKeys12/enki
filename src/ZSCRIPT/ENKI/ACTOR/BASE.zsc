@@ -23,7 +23,7 @@ class Ek_Actor:Actor{
 
     virtual
     void Think()
-    {bool Acting=Brain.Think();}
+    {Brain.Think();}
 }
 
 class ZZZ:Ek_Actor{
