@@ -74,6 +74,7 @@ class Ek_ContextMap{
             self.yzRes==yzRes;
         }
         Mapping.Resize(XYBasis.Size()+XZBasis.Size()+YZBasis.Size());
+        Reset();
     }
 
     virtual
