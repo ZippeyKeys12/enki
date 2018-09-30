@@ -1,0 +1,106 @@
+class Ek_ContextMap{
+    uint xyRes,
+         xzRes,
+         yzRes;
+
+    Array<double> Mapping;
+
+    Av_Vector_V3 XYBasis,
+                 XZBasis,
+                 YZBasis;
+
+    virtual
+    void AddVector(Vector3 ideal){
+        int i=0;
+        if(XYBasis)
+            for(int j=0; j<XYBasis.Size(); j++){
+                Mapping[i]+=ideal dot XYBasis.Get(j);
+                i++;
+            }
+        if(XZBasis)
+            for(int j=0; j<XZBasis.Size(); j++){
+                Mapping[i]+=ideal dot XZBasis.Get(j);
+                i++;
+            }
+        if(YZBasis)
+            for(int j=0; j<YZBasis.Size(); j++){
+                Mapping[i]+=ideal dot YZBasis.Get(j);
+                i++;
+            }
+    }
+
+    virtual
+    void Update(uint xyRes=0, uint xzRes=0, uint yzRes=0){
+        if(self.xyRes!=xyRes){
+            if(xyRes){
+                XYBasis=Av_Vector_V3.Create(13*xyRes/3);
+                int i=0;
+                for(int j=0; j<360; j+=90./xyRes){
+                    XYBasis.Set(i, (cos(j), sin(j), 0));
+                    i++;
+                }
+            }else
+                XYBasis=null;
+            self.xyRes==xyRes;
+        }
+        if(self.xzRes!=xzRes){
+            if(xzRes){
+                XZBasis=Av_Vector_V3.Create(13*xzRes/3-2*!!XYBasis);
+                int i=0;
+                for(int j=0; j<360; j+=90./xzRes){
+                    if(XYBasis && j%180==0)
+                        continue;
+                    XZBasis.Set(i, (cos(j), 0, sin(j)));
+                    i++;
+                }
+            }else
+                XZBasis=null;
+            self.xzRes==xzRes;
+        }
+        if(self.yzRes!=yzRes){
+            if(yzRes){
+                YZBasis=Av_Vector_V3.Create(13*yzRes/3-2*(!!XYBasis+!!XZBasis));
+                int i=0;
+                for(int j=0; j<360; j+=90./yzRes){
+                    if(XYBasis && j%180==0)
+                        continue;
+                    if(XZBasis && j-90%180==0)
+                        continue;
+                    YZBasis.Set(i, (0, cos(j), sin(j)));
+                    i++;
+                }
+            }else
+                YZBasis=null;
+            self.yzRes==yzRes;
+        }
+        Mapping.Resize(XYBasis.Size()+XZBasis.Size()+YZBasis.Size());
+    }
+
+    virtual
+    Vector3 Evaluate() const{
+        Vector3 result=(0, 0, 0);
+        int i=0, j;
+        if(XYBasis)
+            for(j=0; j<XYBasis.Size(); j++){
+                result+=Mapping[i]*XYBasis.Get(j);
+                i++;
+            }
+        if(XZBasis)
+            for(j=0; j<XZBasis.Size(); j++){
+                result+=Mapping[i]*XZBasis.Get(j);
+                i++;
+            }
+        if(YZBasis)
+            for(j=0; j<YZBasis.Size(); j++){
+                result+=Mapping[i]*YZBasis.Get(j);
+                i++;
+            }
+        return result.Unit();
+    }
+
+    virtual
+    void Reset(){
+        for(int i=0; i<Mapping.Size(); i++)
+            Mapping[i]=0;
+    }
+}
