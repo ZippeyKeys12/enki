@@ -95,7 +95,10 @@ class Ek_ContextMap{
                 result+=Mapping[i]*YZBasis.Get(j);
                 i++;
             }
-        return result.Unit();
+        if(result.Length())
+            return result.Unit();
+        else
+            return result;
     }
 
     virtual
