@@ -1,0 +1,48 @@
+enum Ek_EInfluence{
+    INF_None,
+    INF_Interest,
+    INF_Danger,
+}
+
+class Ek_SenseManager:Av_Object{
+    Ek_ContextMap Interest,
+                  Danger;
+
+    static
+    Ek_SenseManager Create(){
+        let result=new('Ek_SenseManager');
+        result.Interest=Ek_ContextMap.Create(.5);
+        result.Danger=Ek_ContextMap.Create(.5);
+        return result;
+    }
+
+    virtual
+    void AddInfluence(Vector3 influence, Ek_EInfluence type){
+        switch(type){
+            case INF_Interest: return Interest.AddVector(influence);
+            case INF_Danger: return Danger.AddVector(influence);
+            default: Error("Invalid influence type: "..type);
+        }
+    }
+
+    virtual
+    Vector3 Evaluate(){
+        Vector3 result=Interest.Evaluate()-Danger.Evaluate();
+        if(result.Length())
+            return result.Unit();
+        else
+            return result;
+    }
+
+    virtual
+    void Age(){
+        Interest.Age();
+        Danger.Age();
+    }
+
+    virtual
+    void Reset(){
+        Interest.Reset();
+        Danger.Reset();
+    }
+}
