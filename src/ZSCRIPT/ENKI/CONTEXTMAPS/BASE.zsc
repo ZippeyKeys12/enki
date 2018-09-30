@@ -3,11 +3,20 @@ class Ek_ContextMap{
          xzRes,
          yzRes;
 
+    double AgingRate;
+
     Array<double> Mapping;
 
     Av_Vector_V3 XYBasis,
                  XZBasis,
                  YZBasis;
+
+    static
+    Ek_ContextMap Create(double agingRate){
+        let result=new('Ek_ContextMap');
+        result.AgingRate=agingRate;
+        return result;
+    }
 
     virtual
     void AddVector(Vector3 ideal){
@@ -100,6 +109,12 @@ class Ek_ContextMap{
             return result.Unit();
         else
             return result;
+    }
+
+    virtual
+    void Age(){
+        for(int i=0; i<Mapping.Size(); i++)
+            Mapping[i]*=AgingRate;
     }
 
     virtual
