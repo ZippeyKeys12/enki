@@ -18,7 +18,7 @@ class Ek_Actor:Actor{
 
     virtual
     clearscope
-    bool IsFriend(Actor Other) const
+    bool IsAlly(Actor Other) const
     {return Species==Other.Species;}
 
     virtual
