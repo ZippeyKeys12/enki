@@ -3,19 +3,16 @@ class Ek_Brain play abstract{
 
     Ek_Stack Stack;
 
-    Ek_SenseManager CurrKnowledge;
-
-    Array<Ek_SensorLobe> __Sense__;
-    Array<Ek_ReactorLobe> __React__;
-    Array<Ek_PlannerLobe> __Plan__;
-    Array<Ek_ActuatorLobe> __Act__;
+    Ek_SensorLobe __Sense__;
+    Ek_ReactorLobe __React__;
+    Ek_PlannerLobe __Plan__;
+    Ek_ActuatorLobe __Act__;
 
     static
     Ek_Brain Create(Class<Ek_Brain> Type, Ek_Actor Owner){
         Ek_Brain Result=Ek_Brain(new(Type));
         Result.Owner=Owner;
         Result.Stack=new('Ek_Stack');
-        Result.CurrKnowledge=Ek_SenseManager.Create();
         return Result;
     }
 
@@ -40,13 +37,8 @@ class Ek_Brain play abstract{
 
     // TODO: Solidify architecture of reactor, planner and actuator lobes
     virtual
-    bool React(Ek_Stimulus Stim){
-        bool reacted;
-        for(int i=0; i<__React__.Size(); i++){
-            if(__React__[i].React(Stim))
-                reacted=true;
-        }
-        return reacted;
+    void React(){
+        __React__.React(Stim);
     }
 
     virtual

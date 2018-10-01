@@ -8,6 +8,8 @@ class Ek_SenseManager:Av_Object{
     Ek_ContextMap Interest,
                   Danger;
 
+    Array<Ek_Stimulus> Stimuli;
+
     static
     Ek_SenseManager Create(){
         let result=new('Ek_SenseManager');
@@ -26,7 +28,14 @@ class Ek_SenseManager:Av_Object{
     }
 
     virtual
-    Vector3 Evaluate(){
+    void AddStimulus(Ek_Stimulus stim){
+        if(Stimuli.Find(stim)!=Stimuli.Size())
+            Error("Stimulus: "..stim.ID.." is Already Registered");
+        Stimuli.Push(stim);
+    }
+
+    virtual
+    Vector3 EvalDir(){
         Vector3 result=Interest.Evaluate()-Danger.Evaluate();
         if(result.Length())
             return result.Unit();
@@ -38,11 +47,22 @@ class Ek_SenseManager:Av_Object{
     void Age(){
         Interest.Age();
         Danger.Age();
+        for(int i=0; i<Stimuli.Size(); i++){
+            Ek_Stimulus stim=Stimuli[i];
+            if(!stim){
+                Stimuli.Delete(i);
+            }if(stim.Decay==0){
+                Stimuli.Delete(i);
+                stim.Destroy();
+            }else
+                stim.Tick();
+        }
     }
 
     virtual
     void Reset(){
         Interest.Reset();
         Danger.Reset();
+        Stimuli.Clear();
     }
 }

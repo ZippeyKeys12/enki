@@ -5,8 +5,12 @@ class Ek_Lobe play abstract{
     Ek_Lobe Create(class<Ek_Lobe> type, Ek_Actor owner){
         let result=Ek_Lobe(new(type));
         result.Owner=Owner;
+        result.Init();
         return result;
     }
+
+    virtual
+    void Init(){}
 
     virtual
     void Think(){}
@@ -16,6 +20,13 @@ class Ek_Lobe play abstract{
 }
 
 class Ek_SensorLobe:Ek_Lobe abstract{
+    Ek_SenseManager CurrKnowledge;
+
+    override
+    void Init(){
+        Result.CurrKnowledge=Ek_SenseManager.Create();
+    }
+
     virtual
     bool, Vector3, Ek_EInfluence Sense()
     {return false, Owner.Pos, INF_None;}
