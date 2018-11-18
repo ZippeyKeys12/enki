@@ -24,31 +24,27 @@ class Ek_Brain play abstract{
 
     virtual
     void Sense(){
-        CurrKnowledge.Age();
+        __Sense__.CurrKnowledge.Age();
         bool sensed;
         Vector3 influence;
         Ek_EInfluence type;
-        for(int i=0; i<__Sense__.Size(); i++){
-            [sensed, influence, type]=__Sense__[i].Sense();
-            if(sensed)
-                CurrKnowledge.AddInfluence(influence, type);
-        }
+        [sensed, influence, type]=__Sense__.Sense();
+        if(sensed)
+            __Sense__.CurrKnowledge.AddInfluence(influence, type);
     }
 
     // TODO: Solidify architecture of reactor, planner and actuator lobes
     virtual
-    void React(){
+    void React(Ek_Stimulus Stim){
         __React__.React(Stim);
     }
 
     virtual
     Name Plan(){
         Name PlanOAction='';
-        for(int i=0; i<__Plan__.Size(); i++){
-            PlanOAction=__Plan__[i].Plan();
-            if(PlanOAction)
-                return PlanOAction;
-        }
+        PlanOAction=__Plan__.Plan();
+        if(PlanOAction)
+            return PlanOAction;
         return '';
     }
 
@@ -56,11 +52,6 @@ class Ek_Brain play abstract{
     bool Act(Name PlanOAction){
         if(PlanOAction=='')
             return false;
-        bool Acted;
-        for(int i=0; i<__Act__.Size(); i++){
-            if(__Act__[i].Act(PlanOAction))
-                Acted=true;
-        }
-        return Acted;
+        return __Act__.Act(PlanOAction);
     }
 }

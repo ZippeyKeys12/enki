@@ -1,0 +1,6 @@
+class Ek_EmotionalState{
+    static
+    Ek_EmotionalState Create(){
+        return new('Ek_EmotionalState');
+    }
+}

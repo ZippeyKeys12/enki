@@ -24,7 +24,7 @@ class Ek_SensorLobe:Ek_Lobe abstract{
 
     override
     void Init(){
-        Result.CurrKnowledge=Ek_SenseManager.Create();
+        CurrKnowledge=Ek_SenseManager.Create();
     }
 
     virtual
