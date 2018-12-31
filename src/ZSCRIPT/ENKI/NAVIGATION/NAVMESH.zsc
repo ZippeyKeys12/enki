@@ -1,25 +1,34 @@
-class Ek_NavMesh play{
-    Array<Ek_NavSector> Sectors;
+class Ek_NavMesh:Av_Graph play{
+    // Array<Ek_NavSector> Sectors;
 
-    void createNodes(double Height){
-        Sectors.Resize(Level.Sectors.Size());
-        for(int i=0; i<Sectors.Size(); i++){
+    void createNodes(Actor basis){
+        Nodes.Resize(Level.Sectors.Size());
+        for(int i=0; i<Nodes.Size(); i++){
             Sector Ref=Level.Sectors[i];
             SecPlane Floor=Ref.FloorPlane, Ceiling=Ref.CeilingPlane;
-            if(Ref.FindLowestCeilingPoint()-Ref.FindHighestFloorPoint()<Height)
+            if(Ref.FindLowestCeilingPoint()-Ref.FindHighestFloorPoint()<basis.Height)
                 continue;
-            Sectors[i]=Ek_NavSector.Create(Ref);
+            Nodes[i]=Ek_NavSector.Create(Ref);
         }
+
         for(int i=0; i<Level.Lines.Size(); i++){
             Line Line=Level.Lines[i];
             if((~Line.Flags & Line.ML_TWOSIDED) || (Line.Flags & (Line.ML_BLOCKING | Line.ML_BLOCKMONSTERS | Line.ML_BLOCKEVERYTHING)))
                 continue;
-            Ek_NavSector Front=Sectors[Line.FrontSector.Index()],
-                       Back=Sectors[Line.BackSector.Index()];
+            Ek_NavSector Front=Ek_NavSector(Nodes[Line.frontSector.Index()]),
+                       Back=Ek_NavSector(Nodes[Line.backSector.Index()]);
             if(!Front || !Back)
                 continue;
             Sector FRef=Front.Ref,
                    BRef=Back.Ref;
+            // if(FRef.)
+            Front.Edges.Push(Ek_NavLine.Create(Front, Back, Line.Flags));
+            Back.Edges.Push(Ek_NavLine.Create(Back, Front, Line.Flags));
+        }
+
+        for(int i=0; i<Nodes.Size(); i++){
+            if(!Nodes[i].Edges.Size())
+                Nodes[i]=null;
         }
     }
 }
