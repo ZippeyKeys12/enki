@@ -23,8 +23,8 @@ class Ek_NeuralNetwork{
 
     void Train(Av_Matrix2 InputVals, Av_Matrix2 TargetVals){
         for(int i=0; i<InputVals.Height(); i++){
-            Av_Matrix2 Input=InputVals.Row(i).AsRow(),
-                    Target=TargetVals.Row(i).AsRow();
+            Av_Matrix2 Input=InputVals.Row(i).ToM2(true),
+                    Target=TargetVals.Row(i).ToM2(true);
             Array<Av_Matrix2> Inputs; Inputs.Clear();
             Inputs.Push(Input);
             for(int j=0; j<Layers.Size()-1; j++)
