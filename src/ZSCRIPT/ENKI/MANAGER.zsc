@@ -5,6 +5,8 @@ class Ek_Manager:Thinker{
              M2E_OCC,
              M2E_Ekman;
 
+    Ek_NavMesh navMesh;
+
     static
     Ek_Manager Instance(){
         Ek_Manager p=DataInstance();
@@ -22,6 +24,7 @@ class Ek_Manager:Thinker{
     private
     Ek_Manager Init(){
         ChangeStatNum(STAT_STATIC);
+        navMesh=new('Ek_NavMesh');
         return self;
     }
 }

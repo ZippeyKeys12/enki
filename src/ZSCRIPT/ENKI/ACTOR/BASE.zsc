@@ -26,6 +26,8 @@ class Ek_Actor:Actor{
     {Brain.Think();}
 }
 
+class zzz_brain:Ek_Brain{}
+
 class ZZZ:Ek_Actor{
     Av_Plan Plan;
 
@@ -35,28 +37,36 @@ class ZZZ:Ek_Actor{
         Height=56;
         [Type]
         Monster;
+        [Ek_Actor]
+        Brain='zzz_brain';
     }
 
     States{
         Spawn:
             POSS A 1{
-                // if(!Target)
-                //     Target=Ek_Manager.Instance().WorldState.Player;
+                if(!target)
+                    target=ZPlayer(ThinkerIterator.Create('ZPlayer', STAT_DEFAULT).Next());
+
                 // if(CheckSight(Target)){
                 //     Plan=null;
                 //     A_MoveTo();
                 // }else{
-                //     A_Star();
-                //     if(Plan && Plan.Size()>0 && Plan.Peek()){
-                //         if(Distance3DSquared(ZPathNode(Plan.Peek()).Marker)<1){
-                //             Plan.Pop();
-                //             console.printf("yesx!");
-                //         }
-                //         if(Plan.Size()>0){
-                //             console.printf(ZPathNode(Plan.Peek()).Marker.Args[0].."aa");
-                //             A_MoveTo(ZPathNode(Plan.Peek()).Marker);
-                //         }
-                //     }else Plan=null;
+                if(target){
+                    A_Star();
+                    if(plan && plan.Size() && plan.Peek() && plan.Peek(1)){
+                        if(level.Vec3Diff(pos, Ek_NavLine(plan.Peek().EdgeTo(plan.Peek(1))).Midpoint).Length()<radius+3){
+                            plan.Pop();
+                            console.printf("yesx!");
+                        }
+                        if(plan.Size()>0){
+                            console.printf(Ek_NavSector(plan.Peek()).ref.Index().."aa");
+                            vel=Seek(Ek_NavLine(plan.Peek().EdgeTo(plan.Peek(1))).Midpoint);
+                        }
+                    }else{
+                        plan=null;
+                        vel=Seek(target.pos);
+                    }
+                }
                 // }
             }
             loop;
@@ -68,12 +78,15 @@ class ZZZ:Ek_Actor{
         Angle=ATan2(Vel.Y, Vel.X);
     }
 
-    void A_Star(Actor Target=null, int Type=0){
-        // if(!Target){
-        //     if(self.Target)
-        //         Target=self.Target;
-        //     else return;
-        // }
+    void A_Star(Actor target=null, int type=0){
+        if(!target){
+            if(self.target)
+                target=self.target;
+            else return;
+        }
+
+        Plan=Ek_Manager.Instance().navMesh.GetPath(curSector, target.curSector);
+
         // ActorIterator it=ActorIterator.Create(TID_NODES, "ZPathMarker");
         // double New,
         //        LastStart=double.MAX,

@@ -1,7 +1,11 @@
 class Ek_NavMesh:Av_Graph play{
     // Array<Ek_NavSector> Sectors;
 
-    void createNodes(Actor basis){
+    Av_Plan GetPath(Sector curSector, Sector goalSector){
+        return GetPlan(nodes[curSector.Index()], nodes[goalSector.Index()]);
+    }
+
+    void BuildNodes(Actor basis){
         Nodes.Resize(Level.Sectors.Size());
         for(int i=0; i<Nodes.Size(); i++){
             Sector Ref=Level.Sectors[i];
@@ -13,7 +17,7 @@ class Ek_NavMesh:Av_Graph play{
 
         for(int i=0; i<Level.Lines.Size(); i++){
             Line Line=Level.Lines[i];
-            if((~Line.Flags & Line.ML_TWOSIDED) || (Line.Flags & (Line.ML_BLOCKING | Line.ML_BLOCKMONSTERS | Line.ML_BLOCKEVERYTHING)))
+            if((Line.Flags & (Line.ML_BLOCKING | Line.ML_BLOCKMONSTERS | Line.ML_BLOCKEVERYTHING)) || (~Line.Flags & Line.ML_TWOSIDED))
                 continue;
             Ek_NavSector Front=Ek_NavSector(Nodes[Line.frontSector.Index()]),
                        Back=Ek_NavSector(Nodes[Line.backSector.Index()]);
@@ -22,11 +26,13 @@ class Ek_NavMesh:Av_Graph play{
             Sector FRef=Front.Ref,
                    BRef=Back.Ref;
             // if(FRef.)
-            Front.Edges.Push(Ek_NavLine.Create(Front, Back, Line.Flags));
-            Back.Edges.Push(Ek_NavLine.Create(Back, Front, Line.Flags));
+            Front.Edges.Push(Ek_NavLine.Create(Front, Back, Line));
+            Back.Edges.Push(Ek_NavLine.Create(Back, Front, Line));
         }
 
         for(int i=0; i<Nodes.Size(); i++){
+            if(!Nodes[i])
+                continue;
             if(!Nodes[i].Edges.Size())
                 Nodes[i]=null;
         }
@@ -55,7 +61,7 @@ class Ek_NavSector:Av_Node{
     }
 
     override
-    double DistanceTo(Av_Node Other){
+    double DistanceTo(Av_Node other){
         Ek_NavSector Actual=Ek_NavSector(Other);
         if(!Actual)
             Error("Attempted to connect non-Ek_PathNode");
@@ -64,15 +70,18 @@ class Ek_NavSector:Av_Node{
 }
 
 class Ek_NavLine:Av_Edge{
-    int LineFlags;
+    int Flags;
 
     Vector3 Midpoint;
 
+    Line Ref;
+
     static
-    Ek_NavLine Create(Ek_NavSector From, Ek_NavSector To, int LineFlags){
+    Ek_NavLine Create(Ek_NavSector from, Ek_NavSector to, Line ref){
         Ek_NavLine Result=Ek_NavLine(Av_Edge.Create('Ek_NavLine', From, To));
-        Result.LineFlags=LineFlags;
+        Result.Flags=ref.flags;
         Result.Midpoint=Av_Calc.V3().Midpoint(From.Center, To.Center);
+        Result.Ref=ref;
         return Result;
     }
 }
